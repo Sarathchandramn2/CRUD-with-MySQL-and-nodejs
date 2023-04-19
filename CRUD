@@ -1,0 +1,100 @@
+const mysql = require('mysql');
+
+// Create a connection to the database
+const connection = mysql.createConnection({
+  host: 'localhost',
+  user:'root',
+  password: '',
+  database: 'crudsss'
+});
+
+// Connect to the database
+connection.connect((err) => {
+  if (err) {
+    console.error('Error connecting to database:', err.stack);
+    return;
+  }
+  console.log('Connected to database');
+});
+
+// Create operation
+function create(data) {
+  const sql = 'INSERT INTO mytables SET ?';
+  connection.query(sql, data, (err, result) => {
+    if (err) throw err;
+    console.log('Created data:', result);
+  });
+}
+
+// Read operation
+function read(id) {
+  const sql = 'SELECT * FROM mytables WHERE id = ?';
+  connection.query(sql, [id], (err, result) => {
+    if (err) throw err;
+    console.log('Retrieved data:', result);
+  });
+}
+
+// Update operation
+function update(id, data) {
+  const sql = 'UPDATE mytables SET ? WHERE id = ?';
+  connection.query(sql, [data, id], (err, result) => {
+    if (err) throw err;
+    console.log('Updated data:', result);
+  });
+}
+
+// Delete operation
+function del(id) {
+  const sql = 'DELETE FROM mytables WHERE id = ?';
+  connection.query(sql, [id], (err, result) => {
+    if (err) throw err;
+    console.log('Deleted data:', result);
+  });
+}
+
+// Import or connect to your user input library
+const readline = require('readline').createInterface({
+  input: process.stdin,
+  output: process.stdout
+});
+
+// Prompt the user for input
+readline.question('Enter operation (create, read, update, or delete): ', (operation) => {
+  if (operation === 'create') {
+    readline.question('Enter name: ', (name) => {
+      readline.question('Enter age: ', (age) => {
+        readline.question('Enter email: ', (email) => {
+          const data = { name, age, email };
+          create(data);
+          readline.close();
+        });
+      });
+    });
+  } else if (operation === 'read') {
+    readline.question('Enter ID: ', (id) => {
+      read(id);
+      readline.close();
+    });
+  } else if (operation === 'update') {
+    readline.question('Enter ID: ', (id) => {
+      readline.question('Enter new name: ', (name) => {
+        readline.question('Enter new age: ', (age) => {
+          readline.question('Enter new email: ', (email) => {
+            const data = { name, age, email };
+            update(id, data);
+            readline.close();
+          });
+        });
+      });
+    });
+  } else if (operation === 'delete') {
+    readline.question('Enter ID: ', (id) => {
+      del(id);
+      readline.close();
+    });
+  } else {
+    console.log('Invalid operation');
+    readline.close();
+  }
+});
